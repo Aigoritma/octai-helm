@@ -9,4 +9,4 @@ dependencies:
   repository: https://external-secrets.github.io/kubernetes-external-secrets/
   version: 8.5.3
 digest: sha256:5c19a6e39a742182c19d1ec5a14511fb24912570916b45d7063a6a448808053e
-generated: "2023-12-05T18:18:05.452092+03:00"
+generated: "2023-12-11T17:30:12.774616+03:00"
