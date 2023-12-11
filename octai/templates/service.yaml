@@ -1,0 +1,15 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "octai.fullname" . }}
+  labels:
+    {{- include "octai.labels" . | nindent 4 }}
+spec:
+  type: {{ .Values.service.type }}
+  ports:
+    - name: {{ .Values.service.name }}
+      port: {{ .Values.service.port }}
+      protocol: TCP
+      targetPort: http            
+  selector:
+    {{- include "octai.selectorLabels" . | nindent 4 }}
