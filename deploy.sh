@@ -39,6 +39,26 @@ check_and_install_yq() {
 # Check and install jq if not present
 check_and_install_yq
 
+# Read the cloudflared enabled value
+CLOUDFLARE_ENABLED=$(yq eval '.cloudflared.enabled' config.yaml)
+echo "cloudflaredenabled: $CLOUDFLARE_ENABLED"
+
+# Read the Datadog enabled value
+DATADOG_ENABLED=$(yq eval '.datadog.enabled' config.yaml)
+echo "Datadog enabled: $DATADOG_ENABLED"
+
+# Check if CLOUDFLARE_ENABLED environment variable is set
+if [ -z "$CLOUDFLARE_ENABLED" ]; then
+    echo "Error: CLOUDFLARE_ENABLED is not set."
+    exit 1
+fi
+
+# Check if DATADOG_ENABLED environment variable is set
+if [ -z "$DATADOG_ENABLED" ]; then
+    echo "Error: DATADOG_ENABLED is not set."
+    exit 1
+fi
+
 # Read Docker password from config.yaml
 DOCKER_PASSWORD=$(yq eval '.docker.password' config.yaml)
 echo "Docker password: $DOCKER_PASSWORD"
@@ -50,12 +70,15 @@ if [ -z "$DOCKER_PASSWORD" ]; then
 fi
 
 # Create the Kubernetes secret for Docker registry
-kubectl create secret docker-registry regcred \
+kubectl create secret docker-registry data-service \
   --docker-server=https://index.docker.io/v1/ \
   --docker-username=octaidockerhub \
   --docker-password="$DOCKER_PASSWORD" \
-  --docker-email=devops@octai.com \
   -n default
+
+# Helm install with Cloudflared and Datadog conditionals
+helm install --set cloudflared.enabled=$CLOUDFLARE_ENABLED --set datadog.enabled=$DATADOG_ENABLED  octai ./octai/octai-0.1.0.tgz
+
 
 
 
