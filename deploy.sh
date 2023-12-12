@@ -43,9 +43,11 @@ check_and_install_yq
 CLOUDFLARE_ENABLED=$(yq eval '.cloudflared.enabled' config.yaml)
 echo "cloudflaredenabled: $CLOUDFLARE_ENABLED"
 
+
 # Read the Datadog enabled value
 DATADOG_ENABLED=$(yq eval '.datadog.enabled' config.yaml)
 echo "Datadog enabled: $DATADOG_ENABLED"
+
 
 # Check if CLOUDFLARE_ENABLED environment variable is set
 if [ -z "$CLOUDFLARE_ENABLED" ]; then
@@ -56,6 +58,15 @@ fi
 # Check if DATADOG_ENABLED environment variable is set
 if [ -z "$DATADOG_ENABLED" ]; then
     echo "Error: DATADOG_ENABLED is not set."
+    exit 1
+fi
+
+# Read Secret Path from config.yaml
+SECRET_PATH=$(yq eval '.secretPath' config.yaml)
+
+# Check if SECRET_PATH environment variable is set
+if [ -z "$SECRET_PATH" ]; then
+    echo "Error: SECRET_PATH is not set."
     exit 1
 fi
 
@@ -76,8 +87,21 @@ kubectl create secret docker-registry data-service \
   --docker-password="$DOCKER_PASSWORD" \
   -n default
 
+# Execute commands if cloudflared is enabled
+if [ "$CLOUDFLARE_ENABLED" = "true" ]; then
+    echo "Setting up cloudflared..."
+
+    # Create configmaps
+    kubectl create configmap tunnelcert --from-file=cert.pem=./cloudflare/cert.pem 
+    kubectl create configmap credentials --from-file=credentials.json=./cloudflare/credentials.json 
+
+    echo "cloudflared setup completed."
+else
+    echo "cloudflared is not enabled. Skipping setup."
+fi
+
 # Helm install with Cloudflared and Datadog conditionals
-helm install --set cloudflared.enabled=$CLOUDFLARE_ENABLED --set datadog.enabled=$DATADOG_ENABLED  octai ./octai/octai-0.1.0.tgz
+helm install --set cloudflared.enabled=$CLOUDFLARE_ENABLED --set datadog.enabled=$DATADOG_ENABLED --set secretPath=$SECRET_PATH octai ./octai/octai-0.1.0.tgz
 
 
 

@@ -227,9 +227,9 @@ datadog:
 # k8s-service dependency values #
 ##################################################
 
-k8s-service:
-  enabled: false
-  applicationName: cloudflared-admin
+cloudflared:
+  enabled: true
+  applicationName: cloudflared-octai
   replicaCount: 1
   containerResources:
     requests:
@@ -261,10 +261,10 @@ k8s-service:
     credentials:
       as: volume
       subPath: credentials.json
-      mountPath: /etc/cloudflared/credentials.json
+      mountPath: /etc/cloudflared/creds/credentials.json
     cloudflared: 
       as: volume
-      mounthPath: /etc/cloudflared/config
+      mountPath: /etc/cloudflared/config
       items:
         config.yaml:
           filePath: config.yaml
@@ -276,12 +276,11 @@ k8s-service:
         kind: ConfigMap
         metadata:
           name: cloudflared
-          namespace: cloudflared
         data:
           config.yaml: |
             # Name of the tunnel you want to run
             tunnel: ai-int-customer
-            credentials-file: /etc/cloudflared/credentials.json
+            credentials-file: /etc/cloudflared/creds/credentials.json
             # Serves the metrics server under /metrics and the readiness server under /ready
             metrics: 0.0.0.0:2000
             # Autoupdates applied in a k8s pod will be lost when the pod is removed or restarted, so

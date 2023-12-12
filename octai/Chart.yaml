@@ -42,7 +42,8 @@ dependencies:
   - name: k8s-service
     version: v0.2.12
     repository: https://helmcharts.gruntwork.io
-    condition: k8s-service.enabled
+    condition: cloudflared.enabled
+    alias: cloudflared
 
   # - name: datadog
   #   version: 3.37.0
