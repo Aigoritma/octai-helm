@@ -48,6 +48,14 @@ echo "cloudflaredenabled: $CLOUDFLARE_ENABLED"
 DATADOG_ENABLED=$(yq eval '.datadog.enabled' config.yaml)
 echo "Datadog enabled: $DATADOG_ENABLED"
 
+# Read the Datadog API key
+DATADOG_API_KEY=$(yq eval '.["api-key"]' datadog/api-key.yaml)
+echo "Datadog API key: $DATADOG_API_KEY"
+
+# Read the Datadog APM enabled value
+DATADOG_APM_ENABLED=$(yq eval '.datadog.apm.enabled' config.yaml)
+echo "Datadog APM enabled: $DATADOG_APM_ENABLED"
+
 
 # Check if CLOUDFLARE_ENABLED environment variable is set
 if [ -z "$CLOUDFLARE_ENABLED" ]; then
@@ -98,6 +106,18 @@ if [ "$CLOUDFLARE_ENABLED" = "true" ]; then
     echo "cloudflared setup completed."
 else
     echo "cloudflared is not enabled. Skipping setup."
+fi
+
+# Execute commands if Datadog is enabled
+if [ "$DATADOG_ENABLED" = "true" ]; then
+    echo "Setting up Datadog..."
+
+    # Create secret with Datadog API key
+    kubectl create secret generic datadog-secret --from-literal api-key="$DATADOG_API_KEY"
+
+    echo "Datadog setup completed."
+else
+    echo "Datadog is not enabled. Skipping setup."
 fi
 
 # Helm install with Cloudflared and Datadog conditionals

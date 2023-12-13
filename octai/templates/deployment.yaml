@@ -4,7 +4,9 @@ metadata:
   name: {{ include "octai.fullname" . }}
   labels:
     {{- include "octai.labels" . | nindent 4 }}
+    {{- if .Values.datadog.datadog.enabled }}
     {{- include "octai.customDatadogLabels" . | nindent 4 }}
+    {{- end }}
   annotations:
     {{- include "octai.customAnnotations" . | nindent 4 }}
 spec:
@@ -23,7 +25,9 @@ spec:
       {{- end }}
       labels:
         {{- include "octai.selectorLabels" . | nindent 8 }}
+        {{- if .Values.datadog.datadog.enabled }}
         {{- include "octai.customDatadogLabels" . | nindent 8 }}
+        {{- end }}
         gruntwork.io/deployment-type: main
     spec:
       {{- with .Values.imagePullSecrets }}
@@ -71,14 +75,43 @@ spec:
           lifecycle:
             {{- toYaml .| nindent 12 }}
           {{- end }}
-          {{- with .Values.volumeMounts }}
-          volumeMounts:
-            {{- toYaml . | nindent 12 }}
+          {{- if .Values.datadog.datadog.enabled }}
+          env:
+            - name: DD_ENV
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.labels['tags.datadoghq.com/env']
+            - name: DD_SERVICE
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.labels['tags.datadoghq.com/service']
+            - name: DD_VERSION
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.labels['tags.datadoghq.com/version']
+            - name: DD_PROFILING_ENABLED
+              value: "true"
+            - name: DD_LOGS_INJECTION
+              value: "true"
           {{- end }}
-      {{- with .Values.volumes }}
+
+          volumeMounts:
+            {{- with .Values.volumeMounts }}
+            {{- toYaml . | nindent 12 }}
+            {{- end }}
+            {{- if .Values.datadog.datadog.enabled }}
+            - name: apmsocketpath
+              mountPath: /var/run/datadog/
+            {{- end }}      
       volumes:
+        {{- with .Values.volumes }}
         {{- toYaml . | nindent 8 }}
-      {{- end }}
+        {{- end }}
+        {{- if $.Values.datadog.datadog.enabled }}
+        - hostPath:
+            path: /var/run/datadog/
+          name: apmsocketpath
+        {{- end }}
       {{- with .Values.nodeSelector }}
       nodeSelector:
         {{- toYaml . | nindent 8 }}

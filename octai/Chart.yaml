@@ -45,7 +45,7 @@ dependencies:
     condition: cloudflared.enabled
     alias: cloudflared
 
-  # - name: datadog
-  #   version: 3.37.0
-  #   repository: https://helm.datadoghq.com
-  #   condition: datadog.enabled
+  - name: datadog
+    version: 3.37.0
+    repository: https://helm.datadoghq.com
+    condition: datadog.enabled

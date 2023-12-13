@@ -11,5 +11,8 @@ dependencies:
 - name: k8s-service
   repository: https://helmcharts.gruntwork.io
   version: v0.2.12
-digest: sha256:c6ab919e79e76b4c6c951ab90d30a14ad777cb1ec081b2ae2caf7e169357aeed
-generated: "2023-12-12T16:51:41.283425+03:00"
+- name: datadog
+  repository: https://helm.datadoghq.com
+  version: 3.37.0
+digest: sha256:aaa2a2b536c27408550bd58647d06240e948868494b789ba5184e298fbe413de
+generated: "2023-12-13T11:37:24.395416+03:00"

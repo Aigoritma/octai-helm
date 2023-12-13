@@ -72,9 +72,6 @@ volumes:
   - name: data-pv
     persistentVolumeClaim:
       claimName: data-shared-vc-customer
-  - name: apmsocketpath
-    hostPath:
-      path: /var/run/datadog
   - name: cache-volume
     emptyDir: 
       medium: Memory
@@ -84,8 +81,6 @@ volumes:
 volumeMounts: 
   - name: data-pv
     mountPath: "/data"
-  - name: apmsocketpath
-    mountPath: /var/run/datadog
   - name: cache-volume
     mountPath: "/dev/shm"
 
@@ -199,29 +194,31 @@ kubernetes-external-secrets:
 # datadog dependency values #
 ##################################################
 datadog:
-  enbaled: false
+  enabled: true
   targetSystem: "linux"
   datadog:
     processAgent:
       enabled: true
       processCollection: true
-    apm: true
-  site: datadoghq.com
-  clustername: "octai-cluster"
-  apiKeyExistingSecret: datadog-api-key
-  kubeStateMetricsEnabled: true
-  kubeStateMetricCore:
-    enabled: true
-    ignoreLegacyKSMCheck: true
-  containerExclude: "name:.*"
-  containerInclude: "name:^data-service.*"
-  logs:
-    enabled: true
-    containerCollectAll: true
-    containerCollectUsingFiles: true
-    autoMultiLineDetection: true
-  prometheusScrape:
-    enabled: true
+    apm:
+      enabled: true
+      socketEnabled: true
+    site: datadoghq.com
+    clustername: "octai-cluster-test"
+    apiKeyExistingSecret: datadog-secret
+    kubeStateMetricsEnabled: true
+    kubeStateMetricCore:
+      enabled: true
+      ignoreLegacyKSMCheck: true
+    containerExclude: "name:.*"
+    containerInclude: "name:^data-service.*"
+    logs:
+      enabled: true
+      containerCollectAll: true
+      containerCollectUsingFiles: true
+      autoMultiLineDetection: true
+      prometheusScrape:
+        enabled: true
 
 ##################################################
 # k8s-service dependency values #
