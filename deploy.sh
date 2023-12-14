@@ -43,10 +43,21 @@ check_and_install_yq
 CLOUDFLARE_ENABLED=$(yq eval '.cloudflared.enabled' config.yaml)
 echo "cloudflared enabled: $CLOUDFLARE_ENABLED"
 
+# Check if CLOUDFLARE_ENABLED environment variable is set
+if [ -z "$CLOUDFLARE_ENABLED" ]; then
+    echo "Error: CLOUDFLARE_ENABLED is not set."
+    exit 1
+fi
 
 # Read the Datadog enabled value
 DATADOG_ENABLED=$(yq eval '.datadog.enabled' config.yaml)
 echo "Datadog enabled: $DATADOG_ENABLED"
+
+# Check if DATADOG_ENABLED environment variable is set
+if [ -z "$DATADOG_ENABLED" ]; then
+    echo "Error: DATADOG_ENABLED is not set."
+    exit 1
+fi
 
 # Read the Datadog API key
 DATADOG_API_KEY=$(yq eval '.["api-key"]' datadog/api-key.yaml)
@@ -56,25 +67,19 @@ echo "Datadog API key: $DATADOG_API_KEY"
 DATADOG_APM_ENABLED=$(yq eval '.datadog.apm.enabled' config.yaml)
 echo "Datadog APM enabled: $DATADOG_APM_ENABLED"
 
-
-# Check if CLOUDFLARE_ENABLED environment variable is set
-if [ -z "$CLOUDFLARE_ENABLED" ]; then
-    echo "Error: CLOUDFLARE_ENABLED is not set."
+# Check if DATADOG_APM_ENABLED environment variable is set
+if [ -z "$DATADOG_APM_ENABLED" ]; then
+    echo "Error: DATADOG_APM_ENABLED is not set."
     exit 1
 fi
 
-# Check if DATADOG_ENABLED environment variable is set
-if [ -z "$DATADOG_ENABLED" ]; then
-    echo "Error: DATADOG_ENABLED is not set."
-    exit 1
-fi
+# Read the Hostname value
+HOSTNAME=$(yq e '.hostname' config.yaml)
+echo "Hostname: $HOSTNAME"
 
-# Read Secret Path from config.yaml
-SECRET_PATH=$(yq eval '.secretPath' config.yaml)
-
-# Check if SECRET_PATH environment variable is set
-if [ -z "$SECRET_PATH" ]; then
-    echo "Error: SECRET_PATH is not set."
+# Check if HOSTNAME environment variable is set
+if [ -z "$HOSTNAME" ]; then
+    echo "Error: HOSTNAME is not set."
     exit 1
 fi
 
@@ -125,5 +130,7 @@ helm install \
     --set cloudflared.enabled="$CLOUDFLARE_ENABLED" \
     --set datadog.enabled="$DATADOG_ENABLED" \
     --set datadog.apm.enabled="$DATADOG_APM_ENABLED" \
-    --set secretPath="$SECRET_PATH" \
+    --set ingress.hosts[0].host="$HOSTNAME" \
+    --set ingress.hosts[0].paths[0].path=/ \
+    --set ingress.hosts[0].paths[0].pathType=Prefix \
     octai ./octai/octai-0.1.0.tgz

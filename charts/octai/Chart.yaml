@@ -49,3 +49,8 @@ dependencies:
     version: 3.37.0
     repository: https://helm.datadoghq.com
     condition: datadog.enabled
+  
+  - name: mongodb
+    version: 13.9.3
+    repository: https://charts.bitnami.com/bitnami
+    condition: mongodb.enabled

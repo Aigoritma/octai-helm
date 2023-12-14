@@ -8,13 +8,13 @@ image:
   repository: octaidockerhub/octai
   pullPolicy: Always
   # Overrides the image tag whose default is the chart appVersion.
-  tag: v1.1.0
+  tag: test
 
 imagePullSecrets: 
   - name: data-service
 
-nameOverride: "data-service"
-fullnameOverride: "data-service"
+# nameOverride: "data-service"
+# fullnameOverride: "data-service"
 
 serviceAccount:
   # Specifies whether a service account should be created
@@ -59,7 +59,7 @@ lifecycle:
         - "5"
 envFrom:
   - secretRef:
-      name: data-service
+      name: octai
 autoscaling:
   enabled: false
   minReplicas: 1
@@ -221,7 +221,7 @@ datadog:
         enabled: true
 
 ##################################################
-# k8s-service dependency values #
+# cloudflared dependency values #
 ##################################################
 
 cloudflared:
@@ -294,15 +294,38 @@ cloudflared:
             ingress: 
               # The first rule proxies traffic to the httpbin sample Service defined in app.yaml
               - hostname: customer.ai-int.com
-                service: http://data-service.default.svc.cluster.local:8080
+                service: http://octai.default.svc.cluster.local:8080
               - hostname: customer.ai-int.com
                 originRequest:
                   bastionMode: true
               - service: http_status:404
 
             
+##################################################
+# mongodb dependency values #
+##################################################
 
-
-      
-
+mongodb:
+  enabled: true
+  applicationName: mongodb-octai
+  deploymentAnnotations:
+    reloader.stakater.com/auto: "true"
+  auth:
+    enabled: true
+    rootUser: octai-root
+    rootPassword: octai-password
+    usernames:
+      - octai-mongo
+    passwords:
+      - octai-password
+    databases:
+      - octai-data
+  resources:
+    limits:
+      cpu: "0.5"
+      memory: 512Mi
+    requests:
+      cpu: "0.5"
+      memory: 512Mi
+  architecture: "standalone"
   

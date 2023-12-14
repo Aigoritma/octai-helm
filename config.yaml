@@ -7,6 +7,6 @@ datadog:
     enabled: true
 
 cloudflared:
-  enabled: false
+  enabled: true
 
-secretPath: octai/data-service/env
+hostname: gw.customer-test.octai.com
