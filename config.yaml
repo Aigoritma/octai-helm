@@ -5,9 +5,8 @@ datadog:
   enabled: true
   apm:
     enabled: true
-    
+
 cloudflared:
   enabled: false
-
 
 secretPath: octai/data-service/env

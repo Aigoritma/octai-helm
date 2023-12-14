@@ -41,7 +41,7 @@ check_and_install_yq
 
 # Read the cloudflared enabled value
 CLOUDFLARE_ENABLED=$(yq eval '.cloudflared.enabled' config.yaml)
-echo "cloudflaredenabled: $CLOUDFLARE_ENABLED"
+echo "cloudflared enabled: $CLOUDFLARE_ENABLED"
 
 
 # Read the Datadog enabled value
@@ -120,9 +120,10 @@ else
     echo "Datadog is not enabled. Skipping setup."
 fi
 
-# Helm install with Cloudflared and Datadog conditionals
-helm install --set cloudflared.enabled=$CLOUDFLARE_ENABLED --set datadog.enabled=$DATADOG_ENABLED --set secretPath=$SECRET_PATH octai ./octai/octai-0.1.0.tgz
-
-
-
-
+# Helm install with Cloudflared, Datadog, and Datadog APM conditionals
+helm install \
+    --set cloudflared.enabled="$CLOUDFLARE_ENABLED" \
+    --set datadog.enabled="$DATADOG_ENABLED" \
+    --set datadog.apm.enabled="$DATADOG_APM_ENABLED" \
+    --set secretPath="$SECRET_PATH" \
+    octai ./octai/octai-0.1.0.tgz
