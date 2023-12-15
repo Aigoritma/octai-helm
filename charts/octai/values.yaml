@@ -2,6 +2,10 @@
 # This is a YAML-formatted file.
 # Declare variables to be passed into your templates.
 
+###############################################
+# deployment values #
+################################################
+
 replicaCount: 1
 
 image:
@@ -34,6 +38,10 @@ service:
   type: ClusterIP
   name: app
   port: 8080
+
+###############################################
+# ingress values #
+################################################
 
 ingress:
   enabled: true
