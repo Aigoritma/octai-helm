@@ -36,8 +36,8 @@ spec:
       {{- end }}
       containers:
         - name: {{ .Chart.Name }}
-          image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
-          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          image: "{{ .Values.imageCompute.repository }}:{{ .Values.imageCompute.tag | default .Chart.AppVersion }}"
+          imagePullPolicy: {{ .Values.imageCompute.pullPolicy }}
           ports:
             - name: http
               containerPort: {{ .Values.service.port }}
@@ -94,7 +94,6 @@ spec:
             - name: DD_LOGS_INJECTION
               value: "true"
           {{- end }}
-
           volumeMounts:
             {{- with .Values.volumeMounts }}
             {{- toYaml . | nindent 12 }}
@@ -102,7 +101,39 @@ spec:
             {{- if .Values.datadog.datadog.enabled }}
             - name: apmsocketpath
               mountPath: /var/run/datadog/
-            {{- end }}      
+            {{- end }}
+        - name: {{ .Chart.Name }}-worker
+          image: "{{ .Values.imageWorker.repository }}:{{ .Values.imageWorker.tag | default .Chart.AppVersion }}" 
+          imagePullPolicy: {{ .Values.imageWorker.pullPolicy }}
+          ports:
+            - name: http
+              containerPort: {{ .Values.service.port }}
+              protocol: TCP
+          envFrom:
+            {{- toYaml .Values.envFrom | nindent 12 }}
+          {{- with .Values.lifecycle}}
+          lifecycle:
+            {{- toYaml .| nindent 12 }}
+          {{- end }}
+          {{- if .Values.datadog.datadog.enabled }}
+          env:
+            - name: DD_ENV
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.labels['tags.datadoghq.com/env']
+            - name: DD_SERVICE
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.labels['tags.datadoghq.com/service']
+            - name: DD_VERSION
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.labels['tags.datadoghq.com/version']
+            - name: DD_PROFILING_ENABLED
+              value: "true"
+            - name: DD_LOGS_INJECTION
+              value: "true"
+          {{- end }}
       volumes:
         {{- with .Values.volumes }}
         {{- toYaml . | nindent 8 }}
