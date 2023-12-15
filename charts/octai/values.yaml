@@ -41,7 +41,7 @@ ingress:
   annotations: 
     kubernetes.io/ingress.class: nginx
   hosts:
-    - host: "gw.customer.octai.com"
+    - host: ""
       paths:
         - path: /
           pathType: Prefix
@@ -194,7 +194,7 @@ kubernetes-external-secrets:
 # datadog dependency values #
 ##################################################
 datadog:
-  enabled: true
+  enabled: false
   targetSystem: "linux"
   datadog:
     processAgent:
@@ -225,7 +225,7 @@ datadog:
 ##################################################
 
 cloudflared:
-  enabled: true
+  enabled: false
   applicationName: cloudflared-octai
   replicaCount: 1
   containerResources:
