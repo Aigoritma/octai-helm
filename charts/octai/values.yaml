@@ -8,14 +8,14 @@
 
 replicaCount: 1
 
-imageCompute:
-  repository: octaidockerhub/compute
+imageData:
+  repository: octaidockerhub/octai-data-service
   pullPolicy: Always
   # Overrides the image tag whose default is the chart appVersion.
   tag: latest
 
-imageWorker:
-  repository: octaidockerhub/worker
+imageCompute:
+  repository: octaidockerhub/octai-compute-engine
   pullPolicy: Always
   # Overrides the image tag whose default is the chart appVersion.
   tag: latest
