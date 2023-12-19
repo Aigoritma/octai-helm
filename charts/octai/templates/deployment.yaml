@@ -70,7 +70,8 @@ spec:
             timeoutSeconds: 120
             successThreshold: 1
           envFrom:
-            {{- toYaml .Values.envFrom | nindent 12 }}
+            - secretRef:
+                name: {{ include "octai.fullname" . }}
           {{- with .Values.lifecycle}}
           lifecycle:
             {{- toYaml .| nindent 12 }}
