@@ -36,8 +36,8 @@ spec:
       {{- end }}
       containers:
         - name: {{ .Chart.Name }}
-          image: "{{ .Values.imageCompute.repository }}:{{ .Values.imageCompute.tag | default .Chart.AppVersion }}"
-          imagePullPolicy: {{ .Values.imageCompute.pullPolicy }}
+          image: "{{ .Values.imageData.repository }}:{{ .Values.imageData.tag | default .Chart.AppVersion }}"
+          imagePullPolicy: {{ .Values.imageData.pullPolicy }}
           ports:
             - name: http
               containerPort: {{ .Values.service.port }}
@@ -102,9 +102,9 @@ spec:
             - name: apmsocketpath
               mountPath: /var/run/datadog/
             {{- end }}
-        - name: {{ .Chart.Name }}-worker
-          image: "{{ .Values.imageWorker.repository }}:{{ .Values.imageWorker.tag | default .Chart.AppVersion }}" 
-          imagePullPolicy: {{ .Values.imageWorker.pullPolicy }}
+        - name: {{ .Chart.Name }}-compute
+          image: "{{ .Values.imageCompute.repository }}:{{ .Values.imageCompute.tag | default .Chart.AppVersion }}" 
+          imagePullPolicy: {{ .Values.imageCompute.pullPolicy }}
           ports:
             - name: http
               containerPort: {{ .Values.service.port }}
@@ -134,6 +134,14 @@ spec:
             - name: DD_LOGS_INJECTION
               value: "true"
           {{- end }}
+          volumeMounts:
+            {{- with .Values.volumeMounts }}
+            {{- toYaml . | nindent 12 }}
+            {{- end }}
+            {{- if .Values.datadog.datadog.enabled }}
+            - name: apmsocketpath
+              mountPath: /var/run/datadog/
+            {{- end }}
       volumes:
         {{- with .Values.volumes }}
         {{- toYaml . | nindent 8 }}
