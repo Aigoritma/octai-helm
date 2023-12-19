@@ -77,9 +77,10 @@ lifecycle:
       command: 
         - sleep
         - "5"
-envFrom:
-  - secretRef:
-      name: octai
+# envFrom:
+#   - secretRef:
+#       name: octai
+
 autoscaling:
   enabled: false
   minReplicas: 1
