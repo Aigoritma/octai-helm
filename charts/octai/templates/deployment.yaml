@@ -71,7 +71,7 @@ spec:
             successThreshold: 1
           envFrom:
             - secretRef:
-                name: {{ include "octai.fullname" . }}
+                name: {{ include "octai.fullname" . }}-secret
           {{- with .Values.lifecycle}}
           lifecycle:
             {{- toYaml .| nindent 12 }}
@@ -112,7 +112,7 @@ spec:
               protocol: TCP
           envFrom:
             - secretRef:
-                name: {{ include "octai.fullname" . }}
+                name: {{ include "octai.fullname" . }}-secret
           {{- with .Values.lifecycle}}
           lifecycle:
             {{- toYaml .| nindent 12 }}
