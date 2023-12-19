@@ -27,7 +27,7 @@ image:
   tag: test
 
 imagePullSecrets: 
-  - name: data-service
+  - name: octai
 
 # nameOverride: "data-service"
 # fullnameOverride: "data-service"
