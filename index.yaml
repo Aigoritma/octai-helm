@@ -3,6 +3,42 @@ entries:
   octai:
   - apiVersion: v2
     appVersion: 1.16.0
+    created: "2023-12-19T09:09:29.812994924Z"
+    dependencies:
+    - condition: reloader.enabled
+      name: reloader
+      repository: https://stakater.github.io/stakater-charts
+      version: v1.0.52
+    - condition: ingress-nginx.enabled
+      name: ingress-nginx
+      repository: https://kubernetes.github.io/ingress-nginx
+      version: 4.2.0
+    - condition: kubernetes-external-secrets.enabled
+      name: kubernetes-external-secrets
+      repository: https://external-secrets.github.io/kubernetes-external-secrets/
+      version: 8.5.3
+    - alias: cloudflared
+      condition: cloudflared.enabled
+      name: k8s-service
+      repository: https://helmcharts.gruntwork.io
+      version: v0.2.12
+    - condition: datadog.enabled
+      name: datadog
+      repository: https://helm.datadoghq.com
+      version: 3.37.0
+    - condition: mongodb.enabled
+      name: mongodb
+      repository: https://charts.bitnami.com/bitnami
+      version: 13.9.3
+    description: A Helm chart for Octai
+    digest: 101bf2b8c9b3a5ac158836d5140a7e10151c2e45179b55942c7e4e478adf7a68
+    name: octai
+    type: application
+    urls:
+    - https://github.com/Aigoritma/octai-helm/releases/download/octai-0.1.1/octai-0.1.1.tgz
+    version: 0.1.1
+  - apiVersion: v2
+    appVersion: 1.16.0
     created: "2023-12-15T07:43:20.873519595Z"
     dependencies:
     - condition: reloader.enabled
@@ -37,4 +73,4 @@ entries:
     urls:
     - https://github.com/Aigoritma/octai-helm/releases/download/octai-0.1.0/octai-0.1.0.tgz
     version: 0.1.0
-generated: "2023-12-15T07:43:20.873551296Z"
+generated: "2023-12-19T09:09:29.813007487Z"
