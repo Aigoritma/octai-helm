@@ -315,7 +315,7 @@ cloudflared:
             ingress: 
               # The first rule proxies traffic to the httpbin sample Service defined in app.yaml
               - hostname: customer.ai-int.com
-                service: http://octai.default.svc.cluster.local:8080
+                service: http://octai-octai.default.svc.cluster.local:8080
               - hostname: customer.ai-int.com
                 originRequest:
                   bastionMode: true
