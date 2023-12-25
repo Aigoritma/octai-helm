@@ -50,6 +50,7 @@ service:
   type: ClusterIP
   name: app
   port: 8080
+  computePort: 80
 
 ###############################################
 # ingress values #
@@ -60,15 +61,10 @@ ingress:
   annotations: 
     kubernetes.io/ingress.class: nginx
   hosts:
-    - host: ""
+    - host: "customer.gw.app.octai.com"
       paths:
         - path: /
           pathType: Prefix
-
-  tls: []
-  #  - secretName: chart-example-tls
-  #    hosts:
-  #      - chart-example.local
 
 lifecycle: 
   preStop:
@@ -142,72 +138,73 @@ secretPath: octai/data-service/env
 ###############################################
 # reloader values #
 ################################################
-reloader:
-  enabled: true
-  reloader:
-    watchGlobally: true
+# reloader:
+#   enabled: false
+#   reloader:
+#     watchGlobally: true
 
 ##################################################
 # ingress-nginx dependency values #
 ##################################################
-ingress-nginx:
-  enabled: true
-  defaultBackend:
-    enabled: false
-  controller:
-    ingressClass: nginx
-    replicaCount: 1
-    containerPort:
-      http: 80
-      https: 443
-      tohttps: 2443
-    ingressClassResource:
-      name: nginx
-      enabled: true
-      default: false
-      controllerValue: "k8s.io/nginx"
-    config:
-      client-body-buffer-size: "10m"
-      proxy-body-size: "16384m"
-      proxy-send-timeout: "300"
-      proxy-read-timeout: "300"
-      set-real-ip-from: "0.0.0.0/0"
-      keep-alive: "600"
-      keep-alive-requests: "1000"
-      use-http2: true
-      http-snippet: |
-        server {
-          listen 2443;
-          return 308 https://$host$request_uri;
-          }
-      service:
-        externalTrafficPolicy: "Local"
-        targetPorts:
-          http: tohttps
-          https: http
-        annotations:
-          service.beta.kubernetes.io/aws-load-balancer-ssl-cert: arn:aws:acm:us-east-1:935982831076:certificate/34af66bc-88b0-41b0-881e-7c4ba3a60012
-          service.beta.kubernetes.io/aws-load-balancer-backend-protocol: "http"
-          service.beta.kubernetes.io/aws-load-balancer-ssl-ports: "https"
-          service.beta.kubernetes.io/aws-load-balancer-type: nlb
-          service.beta.kubernetes.io/aws-load-balancer-cross-zone-load-balancing-enabled: 'true'
-          service.beta.kubernetes.io/aws-load-balancer-connection-idle-timeout: '3600'
-        internal:
-          enabled: true
+# ingress-nginx:
+#   enabled: false
+#   defaultBackend:
+#     enabled: false
+#   controller:
+#     ingressClass: nginx
+#     replicaCount: 1
+#     containerPort:
+#       http: 80
+#       https: 443
+#       tohttps: 2443
+#     ingressClassResource:
+#       name: nginx
+#       enabled: true
+#       default: false
+#       controllerValue: "k8s.io/nginx"
+#     config:
+#       client-body-buffer-size: "10m"
+#       proxy-body-size: "16384m"
+#       proxy-send-timeout: "300"
+#       proxy-read-timeout: "300"
+#       set-real-ip-from: "0.0.0.0/0"
+#       keep-alive: "600"
+#       keep-alive-requests: "1000"
+#       use-http2: true
+#       http-snippet: |
+#         server {
+#           listen 2443;
+#           return 308 https://$host$request_uri;
+#           }
+#       service:
+#         externalTrafficPolicy: "Local"
+#         targetPorts:
+#           http: tohttps
+#           https: http
+#         annotations:
+#           service.beta.kubernetes.io/aws-load-balancer-ssl-cert: arn:aws:acm:us-east-1:935982831076:certificate/34af66bc-88b0-41b0-881e-7c4ba3a60012
+#           service.beta.kubernetes.io/aws-load-balancer-scheme: "internet-facing"
+#           service.beta.kubernetes.io/aws-load-balancer-backend-protocol: "http"
+#           service.beta.kubernetes.io/aws-load-balancer-ssl-ports: "https"
+#           service.beta.kubernetes.io/aws-load-balancer-type: nlb
+#           service.beta.kubernetes.io/aws-load-balancer-cross-zone-load-balancing-enabled: 'true'
+#           service.beta.kubernetes.io/aws-load-balancer-connection-idle-timeout: '3600'
+#         internal:
+#           enabled: true
 
 ##################################################
 # kubernetes-external-secrets dependency values #
 ##################################################
-kubernetes-external-secrets:
-  enabled: true
-  env: 
-    AWS_REGION: us-east-1
-    METRICS_PORT: 3001
-    WATCH_TIMEOUT: 90000
-    USE_HUMAN_READABLE_LOG_LEVELS: true
-    LOG_LEVEL: error
-  securityContext:
-    fsGroup: 65534
+# kubernetes-external-secrets:
+#   enabled: false
+#   env: 
+#     AWS_REGION: us-east-1
+#     METRICS_PORT: 3001
+#     WATCH_TIMEOUT: 90000
+#     USE_HUMAN_READABLE_LOG_LEVELS: true
+#     LOG_LEVEL: error
+#   securityContext:
+#     fsGroup: 65534
 
 
 ##################################################
@@ -244,81 +241,81 @@ datadog:
 # cloudflared dependency values #
 ##################################################
 
-cloudflared:
-  enabled: false
-  applicationName: cloudflared-octai
-  replicaCount: 1
-  containerResources:
-    requests:
-      cpu: "1"
-      memory: "1024Mi"
-    limits:
-      cpu: "1"
-      memory: "1024Mi"
-  service:
-    enabled: false
-  ingress:
-    enabled: false
-  containerImage:
-    repository: cloudflare/cloudflared
-    tag: 2022.5.0
-    pullPolicy: Always
-  containerCommand:
-    - "cloudflared"
-    - "--no-autoupdate"
-    - "tunnel"
-    - "--config"
-    - "/etc/cloudflared/config/config.yaml"
-    - "run"
-  configMaps:
-    tunnelcert:
-      as: volume
-      subPath: cert.pem
-      mountPath: /etc/cloudflared/cert.pem
-    credentials:
-      as: volume
-      subPath: credentials.json
-      mountPath: /etc/cloudflared/creds/credentials.json
-    cloudflared: 
-      as: volume
-      mountPath: /etc/cloudflared/config
-      items:
-        config.yaml:
-          filePath: config.yaml
-  customResources:
-    enabled: true
-    resources:
-      cloudflared_configmap: |
-        apiVersion: v1
-        kind: ConfigMap
-        metadata:
-          name: cloudflared
-        data:
-          config.yaml: |
-            # Name of the tunnel you want to run
-            tunnel: ai-int-customer
-            credentials-file: /etc/cloudflared/creds/credentials.json
-            # Serves the metrics server under /metrics and the readiness server under /ready
-            metrics: 0.0.0.0:2000
-            # Autoupdates applied in a k8s pod will be lost when the pod is removed or restarted, so
-            # autoupdate doesn't make sense in Kubernetes. However, outside of Kubernetes, we strongly
-            # recommend using autoupdate.
-            no-autoupdate: true
-            # The `ingress` block tells cloudflared which local service to route
-            # requests to. For more about ingress rules, see
-            # https://developers.cloudflare.com/cloudflare-one/connections/connect-apps/configuration/ingress
-            #
-            # Remember, these rules route traffic from cloudflared to a local service. To route traffic
-            # from the internet to cloudflared, run `cloudflared tunnel route dns <tunnel> <hostname>`.
-            # E.g. `cloudflared tunnel route dns example-tunnel tunnel.example.com`.
-            ingress: 
-              # The first rule proxies traffic to the httpbin sample Service defined in app.yaml
-              - hostname: customer.ai-int.com
-                service: http://octai.default.svc.cluster.local:8080
-              - hostname: customer.ai-int.com
-                originRequest:
-                  bastionMode: true
-              - service: http_status:404
+# cloudflared:
+#   enabled: false
+#   applicationName: cloudflared-octai
+#   replicaCount: 1
+#   containerResources:
+#     requests:
+#       cpu: "1"
+#       memory: "1024Mi"
+#     limits:
+#       cpu: "1"
+#       memory: "1024Mi"
+#   service:
+#     enabled: false
+#   ingress:
+#     enabled: false
+#   containerImage:
+#     repository: cloudflare/cloudflared
+#     tag: 2022.5.0
+#     pullPolicy: Always
+#   containerCommand:
+#     - "cloudflared"
+#     - "--no-autoupdate"
+#     - "tunnel"
+#     - "--config"
+#     - "/etc/cloudflared/config/config.yaml"
+#     - "run"
+#   configMaps:
+#     tunnelcert:
+#       as: volume
+#       subPath: cert.pem
+#       mountPath: /etc/cloudflared/cert.pem
+#     credentials:
+#       as: volume
+#       subPath: credentials.json
+#       mountPath: /etc/cloudflared/creds/credentials.json
+#     cloudflared: 
+#       as: volume
+#       mountPath: /etc/cloudflared/config
+#       items:
+#         config.yaml:
+#           filePath: config.yaml
+#   customResources:
+#     enabled: true
+#     resources:
+#       cloudflared_configmap: |
+#         apiVersion: v1
+#         kind: ConfigMap
+#         metadata:
+#           name: cloudflared
+#         data:
+#           config.yaml: |
+#             # Name of the tunnel you want to run
+#             tunnel: ai-int-customer
+#             credentials-file: /etc/cloudflared/creds/credentials.json
+#             # Serves the metrics server under /metrics and the readiness server under /ready
+#             metrics: 0.0.0.0:2000
+#             # Autoupdates applied in a k8s pod will be lost when the pod is removed or restarted, so
+#             # autoupdate doesn't make sense in Kubernetes. However, outside of Kubernetes, we strongly
+#             # recommend using autoupdate.
+#             no-autoupdate: true
+#             # The `ingress` block tells cloudflared which local service to route
+#             # requests to. For more about ingress rules, see
+#             # https://developers.cloudflare.com/cloudflare-one/connections/connect-apps/configuration/ingress
+#             #
+#             # Remember, these rules route traffic from cloudflared to a local service. To route traffic
+#             # from the internet to cloudflared, run `cloudflared tunnel route dns <tunnel> <hostname>`.
+#             # E.g. `cloudflared tunnel route dns example-tunnel tunnel.example.com`.
+#             ingress: 
+#               # The first rule proxies traffic to the httpbin sample Service defined in app.yaml
+#               - hostname: customer.ai-int.com
+#                 service: http://octai.default.svc.cluster.local:8080
+#               - hostname: customer.ai-int.com
+#                 originRequest:
+#                   bastionMode: true
+#               - service: http_status:404
 
             
 ##################################################

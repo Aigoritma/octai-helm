@@ -108,7 +108,7 @@ spec:
           imagePullPolicy: {{ .Values.imageCompute.pullPolicy }}
           ports:
             - name: http
-              containerPort: {{ .Values.service.port }}
+              containerPort: {{ .Values.service.computePort }}
               protocol: TCP
           envFrom:
             - secretRef:

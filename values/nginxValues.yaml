@@ -1,0 +1,49 @@
+defaultBackend:
+  enabled: false
+controller:
+    ingressClass: nginx
+    replicaCount: 2
+    containerPort:
+      http: 80
+      https: 443
+      tohttps: 2443
+    ingressClassResource:
+      name: nginx
+      enabled: true
+      default: false
+      controllerValue: "k8s.io/nginx"
+    config:
+    # Basic proxy settings
+      client-body-buffer-size: "3m"
+      proxy-body-size: "16384m"
+    # Increase timeout settings for WebSocket connections
+      proxy-send-timeout: "600"
+      proxy-read-timeout: "600"
+    # Other NGINX settings
+      set-real-ip-from: "0.0.0.0/0"
+      keep-alive: "600"
+      keep-alive-requests: "1000"
+      use-http2: true
+    #  use-proxy-protocol: "true"
+    # Custom NGINX configuration for WebSocket
+      http-snippet: |
+        server {
+            listen 2443;
+            return 308 https://$host$request_uri;
+            }
+      use-forwarded-headers: 'true'
+    service:
+      externalTrafficPolicy: "Local"
+      targetPorts:
+        http: tohttps
+        https: http
+      annotations:
+        service.beta.kubernetes.io/aws-load-balancer-ssl-cert: arn:aws:acm:us-east-1:935982831076:certificate/34af66bc-88b0-41b0-881e-7c4ba3a60012 
+        service.beta.kubernetes.io/aws-load-balancer-backend-protocol: "http"
+        service.beta.kubernetes.io/aws-load-balancer-ssl-ports: "https"
+        service.beta.kubernetes.io/aws-load-balancer-type: nlb
+        service.beta.kubernetes.io/aws-load-balancer-cross-zone-load-balancing-enabled: 'true'
+        service.beta.kubernetes.io/aws-load-balancer-connection-idle-timeout: '3600'
+        service.beta.kubernetes.io/aws-load-balancer-internal: "false"
+      internal:
+        enabled: false

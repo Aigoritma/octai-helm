@@ -23,27 +23,12 @@ version: 0.1.10
 # It is recommended to use it with quotes.
 appVersion: "1.16.0"
 
-dependencies:
-  - name: reloader
-    version: v1.0.52
-    repository: https://stakater.github.io/stakater-charts
-    condition: reloader.enabled
-  
-  - name: ingress-nginx
-    version: 4.2.0
-    repository: https://kubernetes.github.io/ingress-nginx
-    condition: ingress-nginx.enabled
-
-  - name: kubernetes-external-secrets
-    version: 8.5.3
-    repository: https://external-secrets.github.io/kubernetes-external-secrets/
-    condition: kubernetes-external-secrets.enabled
-  
-  - name: k8s-service
-    version: v0.2.12
-    repository: https://helmcharts.gruntwork.io
-    condition: cloudflared.enabled
-    alias: cloudflared
+dependencies:  
+  # - name: k8s-service
+  #   version: v0.2.12
+  #   repository: https://helmcharts.gruntwork.io
+  #   condition: cloudflared.enabled
+  #   alias: cloudflared
 
   - name: datadog
     version: 3.37.0
