@@ -58,7 +58,7 @@ if helm list -n ingress-nginx --short | grep -q "^ingress-nginx$"; then
     echo "Ingress Nginx release already exists. Upgrading..."
     helm upgrade ingress-nginx ingress-nginx/ingress-nginx \
         -f ./values/nginxValues.yaml \
-        -n ingress-nginx \
+        -n ingress-nginx --create-namespace \
         --set service.annotations.service.beta.kubernetes.io/aws-load-balancer-ssl-cert="$SSL_CERTIFICATE"
 else
     echo "Ingress Nginx release does not exist. Installing..."
@@ -66,7 +66,7 @@ else
     helm repo update
     helm install ingress-nginx ingress-nginx/ingress-nginx \
         -f ./values/nginxValues.yaml \
-        -n ingress-nginx \
+        -n ingress-nginx --create-namespace \
         --set service.annotations.service.beta.kubernetes.io/aws-load-balancer-ssl-cert="$SSL_CERTIFICATE"
 fi
 
