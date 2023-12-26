@@ -36,11 +36,37 @@ check_and_install_yq() {
     fi
 }
 
-# Check and install jq if not present
+# Check and install yq if not present
 check_and_install_yq
 
+check_and_install_helm() {
+    # Function to install Helm
+    install_helm() {
+        echo "Installing Helm..."
+        curl -fsSL https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3 | bash
+    }
+    # Function to upgrade Helm
+    upgrade_helm() {
+        echo "Upgrading Helm..."
+        helm repo update
+    }
+    # Check if Helm is installed
+    if ! command -v helm &> /dev/null
+    then
+        install_helm
+    else
+        upgrade_helm
+    fi
+    # Verify Helm installation
+    helm version
+}
+
+check_and_install_helm
+
+aws eks update-kubeconfig --name octai-cluster-test
+
 ################################################
-# NGİNX
+# NGINX
 ################################################
 
 # Check if Ingress SSL certificate value are set
@@ -74,15 +100,21 @@ fi
 # RELOADER
 #############################################
 
+# create namespace if it doesn't exist
+kubectl get namespace supplementary &> /dev/null || kubectl create namespace supplementary
+
 # Check if the reloader release already exists in the specified namespace
 if helm list -n supplementary --short | grep -q "^reloader$"; then
     echo "Reloader release already exists. Upgrading..."
+
     helm upgrade reloader stakater/reloader -f ./values/stakaterValues.yaml -n supplementary
 else
     echo "Reloader release does not exist. Installing..."
-    helm repo add reloader https://stakater.github.io/stakater-charts
+
+    helm repo add stakater https://stakater.github.io/stakater-charts
     helm repo update
-    helm install reloader stakater/reloader -f ./values/stakaterValues.yaml -n supplementary --create-namespace
+    helm install reloader stakater/reloader -f ./values/stakaterValues.yaml -n supplementary # For helm3 add --generate-name flag or set the release name
+
 fi
 
 ###############################################
@@ -119,7 +151,7 @@ if [ "$CLOUDFLARE_ENABLED" = "true" ]; then
     echo "Setting up cloudflared..."
 
     # Create configmaps
-    kubectl create namespace cloudflared
+    kubectl get namespace cloudflared &> /dev/null || kubectl create namespace cloudflared
     kubectl create configmap tunnelcert --from-file=cert.pem=./cloudflare/cert.pem -n cloudflared
     kubectl create configmap credentials --from-file=credentials.json=./cloudflare/credentials.json -n cloudflared
 
@@ -137,7 +169,7 @@ if [ "$CLOUDFLARE_ENABLED" = "true" ]; then
     # Check if the cloudflared release already exists in the specified namespace
     if helm list -n cloudflared --short | grep -q "^cloudflared$"; then
         echo "Cloudflared release already exists. Upgrading..."
-        helm upgrade cloudflared  -f ./values/cloudflaredValues.yaml -n cloudflared
+        helm upgrade cloudflared k8s-service/k8s-service -f ./values/cloudflaredValues.yaml -n cloudflared
     else
         echo "Cloudflared release does not exist. Installing..."
         helm repo add k8s-service https://helmcharts.gruntwork.io
