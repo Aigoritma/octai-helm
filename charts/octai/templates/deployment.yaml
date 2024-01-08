@@ -35,7 +35,7 @@ spec:
         {{- toYaml . | nindent 8 }}
       {{- end }}
       containers:
-        - name: {{ .Chart.Name }}
+        - name: data-service
           image: "{{ .Values.imageData.repository }}:{{ .Values.imageData.tag | default .Chart.AppVersion }}"
           imagePullPolicy: {{ .Values.imageData.pullPolicy }}
           ports:
@@ -81,15 +81,15 @@ spec:
             - name: DD_ENV
               valueFrom:
                 fieldRef:
-                  fieldPath: metadata.labels['tags.datadoghq.com/env']
+                  fieldPath: metadata.labels['tags.datadoghq.com/data-service.env']
             - name: DD_SERVICE
               valueFrom:
                 fieldRef:
-                  fieldPath: metadata.labels['tags.datadoghq.com/service']
+                  fieldPath: metadata.labels['tags.datadoghq.com/data-service.service']
             - name: DD_VERSION
               valueFrom:
                 fieldRef:
-                  fieldPath: metadata.labels['tags.datadoghq.com/version']
+                  fieldPath: metadata.labels['tags.datadoghq.com/data-service.version']
             - name: DD_PROFILING_ENABLED
               value: "true"
             - name: DD_LOGS_INJECTION
@@ -103,7 +103,7 @@ spec:
             - name: apmsocketpath
               mountPath: /var/run/datadog/
             {{- end }}
-        - name: {{ .Chart.Name }}-compute
+        - name: compute-engine
           image: "{{ .Values.imageCompute.repository }}:{{ .Values.imageCompute.tag | default .Chart.AppVersion }}" 
           imagePullPolicy: {{ .Values.imageCompute.pullPolicy }}
           ports:
@@ -122,15 +122,15 @@ spec:
             - name: DD_ENV
               valueFrom:
                 fieldRef:
-                  fieldPath: metadata.labels['tags.datadoghq.com/env']
+                  fieldPath: metadata.labels['tags.datadoghq.com/compute-engine.env']
             - name: DD_SERVICE
               valueFrom:
                 fieldRef:
-                  fieldPath: metadata.labels['tags.datadoghq.com/service']
+                  fieldPath: metadata.labels['tags.datadoghq.com/compute-engine.service']
             - name: DD_VERSION
               valueFrom:
                 fieldRef:
-                  fieldPath: metadata.labels['tags.datadoghq.com/version']
+                  fieldPath: metadata.labels['tags.datadoghq.com/compute-engine.version']
             - name: DD_PROFILING_ENABLED
               value: "true"
             - name: DD_LOGS_INJECTION

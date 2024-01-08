@@ -57,9 +57,12 @@ app.kubernetes.io/instance:  {{ include "octai.name" . }}
 Custom Datadog labels
 */}}
 {{- define "octai.customDatadogLabels" -}}
-tags.datadoghq.com/env: prod-test
-tags.datadoghq.com/service: {{ include "octai.name" . }}
-tags.datadoghq.com/version: latest
+tags.datadoghq.com/data-service.env: customer
+tags.datadoghq.com/data-service.service: data-service
+tags.datadoghq.com/data-service.version: latest
+tags.datadoghq.com/compute-engine.env: customer
+tags.datadoghq.com/compute-engine.service: compute-engine
+tags.datadoghq.com/compute-engine.version: latest
 {{- end }}
 
 {{/*
