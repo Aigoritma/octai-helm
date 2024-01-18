@@ -3,6 +3,25 @@ entries:
   octai:
   - apiVersion: v2
     appVersion: 1.16.0
+    created: "2024-01-18T13:15:59.741529743Z"
+    dependencies:
+    - condition: datadog.enabled
+      name: datadog
+      repository: https://helm.datadoghq.com
+      version: 3.37.0
+    - condition: mongodb.enabled
+      name: mongodb
+      repository: https://charts.bitnami.com/bitnami
+      version: 13.9.3
+    description: A Helm chart for Octai
+    digest: c61bb9f7a1674fb47bd51224c8d97521c86f477525089f11e15567a7cc2603f1
+    name: octai
+    type: application
+    urls:
+    - https://github.com/Aigoritma/octai-helm/releases/download/octai-1.13.2/octai-1.13.2.tgz
+    version: 1.13.2
+  - apiVersion: v2
+    appVersion: 1.16.0
     created: "2024-01-18T13:08:54.707807954Z"
     dependencies:
     - condition: datadog.enabled
@@ -94,4 +113,4 @@ entries:
     urls:
     - https://github.com/Aigoritma/octai-helm/releases/download/octai-0.1.2/octai-0.1.2.tgz
     version: 0.1.2
-generated: "2024-01-18T13:08:54.707828302Z"
+generated: "2024-01-18T13:15:59.741549269Z"
