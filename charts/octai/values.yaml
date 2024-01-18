@@ -50,7 +50,7 @@ service:
   name: app
   dataPort: 8080
   computePort: 80
-  schedulerPort: 80802
+  schedulerPort: 8082
 
 ###############################################
 # ingress values #
