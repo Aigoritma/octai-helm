@@ -40,7 +40,7 @@ spec:
           imagePullPolicy: {{ .Values.imageData.pullPolicy }}
           ports:
             - name: http
-              containerPort: {{ .Values.service.port }}
+              containerPort: {{ .Values.service.dataPort }}
               protocol: TCP
           startupProbe:
             httpGet:
@@ -131,6 +131,47 @@ spec:
               valueFrom:
                 fieldRef:
                   fieldPath: metadata.labels['tags.datadoghq.com/compute-engine.version']
+            - name: DD_PROFILING_ENABLED
+              value: "true"
+            - name: DD_LOGS_INJECTION
+              value: "true"
+          {{- end }}
+          volumeMounts:
+            {{- with .Values.volumeMounts }}
+            {{- toYaml . | nindent 12 }}
+            {{- end }}
+            {{- if .Values.datadog.datadog.enabled }}
+            - name: apmsocketpath
+              mountPath: /var/run/datadog/
+            {{- end }}
+        - name: scheduler-service
+          image: "{{ .Values.imageScheduler.repository }}:{{ .Values.imageScheduler.tag | default .Chart.AppVersion }}"
+          imagePullPolicy: {{ .Values.imageScheduler.pullPolicy }}
+          ports:
+            - name: http
+              containerPort: {{ .Values.service.schedulerPort }}
+              protocol: TCP
+          envFrom:
+            - secretRef:
+                name: {{ include "octai.fullname" . }}-secret
+          {{- with .Values.lifecycle}}
+          lifecycle:
+            {{- toYaml .| nindent 12 }}
+          {{- end }}
+          {{- if .Values.datadog.datadog.enabled }}
+          env:
+            - name: DD_ENV
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.labels['tags.datadoghq.com/scheduler-service.env']
+            - name: DD_SERVICE
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.labels['tags.datadoghq.com/scheduler-service.service']
+            - name: DD_VERSION
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.labels['tags.datadoghq.com/scheduler-service.version']
             - name: DD_PROFILING_ENABLED
               value: "true"
             - name: DD_LOGS_INJECTION

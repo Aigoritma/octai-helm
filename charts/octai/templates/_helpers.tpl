@@ -63,6 +63,9 @@ tags.datadoghq.com/data-service.version: latest
 tags.datadoghq.com/compute-engine.env: customer
 tags.datadoghq.com/compute-engine.service: compute-engine
 tags.datadoghq.com/compute-engine.version: latest
+tags.datadoghq.com/scheduler-service.env: customer
+tags.datadoghq.com/scheduler-service.service: scheduler-service
+tags.datadoghq.com/scheduler-service.version: latest
 {{- end }}
 
 {{/*

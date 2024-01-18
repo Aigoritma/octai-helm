@@ -5,6 +5,8 @@
 ###############################################
 # deployment values #
 ################################################
+fullnameOverride: ""
+nameOverride: ""
 
 replicaCount: 1
 
@@ -20,17 +22,14 @@ imageCompute:
   # Overrides the image tag whose default is the chart appVersion.
   tag: latest
 
-image:
-  repository: octaidockerhub/octai
+imageScheduler:
+  repository: octaidockerhub/octai-scheduler-service
   pullPolicy: Always
   # Overrides the image tag whose default is the chart appVersion.
-  tag: test
+  tag: latest
 
 imagePullSecrets: 
   - name: octai
-
-# nameOverride: "data-service"
-# fullnameOverride: "data-service"
 
 serviceAccount:
   # Specifies whether a service account should be created
@@ -49,8 +48,9 @@ podLabels: {}
 service:
   type: ClusterIP
   name: app
-  port: 8080
+  dataPort: 8080
   computePort: 80
+  schedulerPort: 80802
 
 ###############################################
 # ingress values #
@@ -228,7 +228,7 @@ datadog:
       enabled: true
       ignoreLegacyKSMCheck: true
     containerExclude: "name:.*"
-    containerInclude: "name:^data-service.*"
+    containerInclude: "name:^data-service.* name:^compute-engine.* name:^scheduler-service.*"
     logs:
       enabled: true
       containerCollectAll: true
