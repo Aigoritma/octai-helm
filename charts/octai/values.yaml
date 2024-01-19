@@ -92,6 +92,9 @@ volumes:
     emptyDir: 
       medium: Memory
       sizeLimit: 500Mi
+  - name: licence-volume
+    configMap:
+      name: licence-config
 
 # Additional volumeMounts on the output Deployment definition.
 volumeMounts: 
@@ -99,6 +102,10 @@ volumeMounts:
     mountPath: "/data"
   - name: cache-volume
     mountPath: "/dev/shm"
+  - name: licence-volume
+    mountPath: "/data-service/licence.json"
+    subPath: licence.json
+  
 
 nodeSelector: {}
 
