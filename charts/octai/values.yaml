@@ -211,7 +211,7 @@ secretPath: octai/data-service/env
 # datadog dependency values #
 ##################################################
 datadog:
-  enabled: false
+  enabled: true
   targetSystem: "linux"
   datadog:
     processAgent:
@@ -221,7 +221,7 @@ datadog:
       enabled: true
       socketEnabled: true
     site: datadoghq.com
-    clustername: "octai-cluster-test"
+    clusterName: ""
     apiKeyExistingSecret: datadog-secret
     kubeStateMetricsEnabled: true
     kubeStateMetricCore:
